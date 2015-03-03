@@ -20,11 +20,6 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name=".LoginActivity"
-            android:label="@string/title_activity_login"
-            android:windowSoftInputMode="adjustResize|stateVisible" >
-        </activity>
-        <activity
             android:name=".PIN"
             android:label="@string/app_name" >
             <intent-filter>
