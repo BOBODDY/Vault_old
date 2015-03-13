@@ -13,6 +13,8 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.boboddy.vault.ui.MainActivity;
+
 
 public class PIN extends ActionBarActivity {
 

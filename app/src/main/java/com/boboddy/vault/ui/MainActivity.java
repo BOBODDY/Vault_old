@@ -1,4 +1,4 @@
-package com.boboddy.vault;
+package com.boboddy.vault.ui;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -13,8 +13,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
+import com.boboddy.vault.PhotoDataSource;
+import com.boboddy.vault.R;
+import com.boboddy.vault.model.PhotoModel;
+
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.sql.SQLException;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -22,7 +28,7 @@ public class MainActivity extends ActionBarActivity {
     ImageView image;
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
-    String mPhotoPath = "";
+    String mPhotoPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +36,8 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         image = (ImageView) findViewById(R.id.image);
+
+        mPhotoPath = "";
     }
 
 
@@ -57,8 +65,8 @@ public class MainActivity extends ActionBarActivity {
                     try {
                         photoFile = createImageFile();
                     } catch (IOException e) {
-                        Log.e("Vault", "COULD NOT CREATE IMAGE FILE");
-                        Log.e("Vault", e.getMessage());
+                        Log.e("Vault", "COULD NOT CREATE IMAGE FILE", e);
+//                        Log.e("Vault", e.getMessage());
                     }
                     if(photoFile != null) {
                         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
@@ -75,25 +83,50 @@ public class MainActivity extends ActionBarActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if(mPhotoPath!= "")
+        Log.d("Vault", "Photo path: " + mPhotoPath);
+        if(!mPhotoPath.equals(""))
         {
-//            Log.d("CameraActivity", mPhotoPath);
             Bitmap imageBitmap = BitmapFactory.decodeFile(mPhotoPath);
             //Scale the Bitmap so that it fits on canvas.
             if(imageBitmap != null)
             {
                 Bitmap scaled = imageBitmap.createScaledBitmap(imageBitmap, (imageBitmap.getWidth()/4), (imageBitmap.getHeight()/4),false);
                 image.setImageBitmap(scaled);
+
+                //Add the image to the database
+                int numBytes = scaled.getByteCount();
+                ByteBuffer buf = ByteBuffer.allocate(numBytes);
+                scaled.copyPixelsToBuffer(buf);
+
+                PhotoModel model = new PhotoModel();
+                model.setFilepath(mPhotoPath);
+                model.setData(buf.array());
+
+                PhotoDataSource photoDataSource = new PhotoDataSource(this);
+                try {
+                    photoDataSource.open();
+                    photoDataSource.insertPhoto(model);
+                    photoDataSource.close();
+                } catch(SQLException e) {
+                    Log.d("Vault", "Caught a SQLException", e);
+//                    Log.d("Vault", e.getMessage());
+                }
+                Log.d("Vault", "Inserted photo in db: " + mPhotoPath);
             }
         }
     }
 
     private File createImageFile() throws IOException {
         File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+//        File storageDir = getFilesDir();
 
         File image = File.createTempFile("image", ".jpg", storageDir);
         mPhotoPath = image.getAbsolutePath();
+//        File image;
+//        image = new File(getFilesDir(), "image_" + Calendar.getInstance().getTimeInMillis() + ".jpg");
+//        mPhotoPath = image.getAbsolutePath();
+//        Log.d("Vault", "Image file created at " + mPhotoPath);
+//        mPhotoPath = image.getAbsolutePath();
         return image;
     }
 }
