@@ -25,7 +25,8 @@ public class PIN extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pin);
-
+		
+		// I should add a check to see if this is the first run and offer to set up a PIN
         title = (TextView) findViewById(R.id.unlock_title);
         pin = (EditText) findViewById(R.id.pin_edittext);
         pin.setGravity(Gravity.CENTER);
