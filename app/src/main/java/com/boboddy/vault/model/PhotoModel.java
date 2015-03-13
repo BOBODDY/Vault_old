@@ -6,7 +6,7 @@ package com.boboddy.vault.model;
 public class PhotoModel {
 
     private long _id;
-    private String filepath;
+//    private String filepath;
     private byte[] data;
 
     public long get_id() {
@@ -17,13 +17,13 @@ public class PhotoModel {
         this._id = _id;
     }
 
-    public String getFilepath() {
-        return filepath;
-    }
+//    public String getFilepath() {
+//        return filepath;
+//    }
 
-    public void setFilepath(String filepath) {
-        this.filepath = filepath;
-    }
+//    public void setFilepath(String filepath) {
+//        this.filepath = filepath;
+//    }
 
     public byte[] getData() {
         return data;

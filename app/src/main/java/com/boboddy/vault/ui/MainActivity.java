@@ -28,7 +28,6 @@ public class MainActivity extends ActionBarActivity {
     ImageView image;
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
-    String mPhotoPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +35,6 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         image = (ImageView) findViewById(R.id.image);
-
-        mPhotoPath = "";
     }
 
 
@@ -61,17 +58,7 @@ public class MainActivity extends ActionBarActivity {
             case R.id.add_item:
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if(takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                    File photoFile = null;
-                    try {
-                        photoFile = createImageFile();
-                    } catch (IOException e) {
-                        Log.e("Vault", "COULD NOT CREATE IMAGE FILE", e);
-//                        Log.e("Vault", e.getMessage());
-                    }
-                    if(photoFile != null) {
-                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-                        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-                    }
+                   startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                 }
                 return true;
         }
@@ -83,23 +70,22 @@ public class MainActivity extends ActionBarActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("Vault", "Photo path: " + mPhotoPath);
-        if(!mPhotoPath.equals(""))
-        {
-            Bitmap imageBitmap = BitmapFactory.decodeFile(mPhotoPath);
-            //Scale the Bitmap so that it fits on canvas.
+        if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+
             if(imageBitmap != null)
             {
+                //Scale the Bitmap so that it fits on canvas.
                 Bitmap scaled = imageBitmap.createScaledBitmap(imageBitmap, (imageBitmap.getWidth()/4), (imageBitmap.getHeight()/4),false);
                 image.setImageBitmap(scaled);
 
                 //Add the image to the database
-                int numBytes = scaled.getByteCount();
+                int numBytes = imageBitmap.getByteCount();
                 ByteBuffer buf = ByteBuffer.allocate(numBytes);
-                scaled.copyPixelsToBuffer(buf);
+                imageBitmap.copyPixelsToBuffer(buf);
 
                 PhotoModel model = new PhotoModel();
-                model.setFilepath(mPhotoPath);
                 model.setData(buf.array());
 
                 PhotoDataSource photoDataSource = new PhotoDataSource(this);
@@ -111,22 +97,17 @@ public class MainActivity extends ActionBarActivity {
                     Log.d("Vault", "Caught a SQLException", e);
 //                    Log.d("Vault", e.getMessage());
                 }
-                Log.d("Vault", "Inserted photo in db: " + mPhotoPath);
+                Log.d("Vault", "Inserted photo in db");
             }
         }
     }
 
-    private File createImageFile() throws IOException {
-        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+//    private File createImageFile() throws IOException {
+////        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 //        File storageDir = getFilesDir();
-
-        File image = File.createTempFile("image", ".jpg", storageDir);
-        mPhotoPath = image.getAbsolutePath();
-//        File image;
-//        image = new File(getFilesDir(), "image_" + Calendar.getInstance().getTimeInMillis() + ".jpg");
+//
+//        File image = File.createTempFile("image", ".jpg", storageDir);
 //        mPhotoPath = image.getAbsolutePath();
-//        Log.d("Vault", "Image file created at " + mPhotoPath);
-//        mPhotoPath = image.getAbsolutePath();
-        return image;
-    }
+//        return image;
+//    }
 }

@@ -12,18 +12,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String TABLE_PHOTOS = "photos";
     public static final String PHOTOS_ID = "_id";
-    public static final String PHOTOS_PATH = "path";
+//    public static final String PHOTOS_PATH = "path";
     public static final String PHOTOS_DATA = "data";
 
     private static final String DATABASE_NAME = "vault.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private SQLiteDatabase database;
 
     private static final String DROP_TABLE = "DROP TABLE IF EXISTS ";
     private static final String DATABASE_CREATE = "create table if not exists "
             + TABLE_PHOTOS + " ("
             + PHOTOS_ID + " integer primary key autoincrement, "
-            + PHOTOS_PATH + " text not null, "
+//            + PHOTOS_PATH + " text not null, "
             + PHOTOS_DATA + " blob not null"
             + ");";
 
