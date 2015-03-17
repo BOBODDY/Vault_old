@@ -5,7 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.boboddy.vault.com.boboddy.vault.db.DatabaseHelper;
+import com.boboddy.vault.db.DatabaseHelper;
 import com.boboddy.vault.model.PhotoModel;
 
 import java.sql.SQLException;

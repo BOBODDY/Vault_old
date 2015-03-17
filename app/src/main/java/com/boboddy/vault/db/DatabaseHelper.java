@@ -1,4 +1,4 @@
-package com.boboddy.vault.com.boboddy.vault.db;
+package com.boboddy.vault.db;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
