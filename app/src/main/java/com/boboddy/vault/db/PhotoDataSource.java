@@ -1,4 +1,4 @@
-package com.boboddy.vault;
+package com.boboddy.vault.db;
 
 import android.content.ContentValues;
 import android.content.Context;
