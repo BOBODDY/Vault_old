@@ -1,9 +1,11 @@
 package com.boboddy.vault.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
@@ -23,6 +25,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Random;
 
 
@@ -66,7 +70,7 @@ public class MainActivity extends ActionBarActivity {
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 File f = null;
                 try {
-                    f = createExtImageFile();
+                    f = createImageFile();
                 } catch (IOException e) {
                     Log.d("Vault", "Error creating image file", e);
                 }
@@ -108,23 +112,6 @@ public class MainActivity extends ActionBarActivity {
                 Bitmap scaled = imageBitmap.createScaledBitmap(imageBitmap, (imageBitmap.getWidth()/4), (imageBitmap.getHeight()/4),false);
                 image.setImageBitmap(scaled);
 
-                File internalFile = null;
-                try {
-                    internalFile = createIntImageFile();
-                } catch (IOException e) {
-                    Log.w("Vault", "Error creating internal file", e);
-                }
-
-                if(internalFile != null) {
-                    copyBitmapToFile(imageBitmap, internalFile);
-                } else {
-                    Log.d("Vault", "Internal file was null");
-                    return;
-                }
-
-                File tmp = new File(filename);
-                tmp.delete();
-
                 //Add the image to the database
                 int numBytes = imageBitmap.getByteCount();
                 ByteBuffer buf = ByteBuffer.allocate(numBytes);
@@ -132,69 +119,50 @@ public class MainActivity extends ActionBarActivity {
 
                 PhotoModel model = new PhotoModel();
                 model.setData(buf.array());
-                model.setFilepath(internalFile.getAbsolutePath());
+                model.setFilepath(filename);
 
-                PhotoDataSource photoDataSource = new PhotoDataSource(this);
-//                try {
-//                    photoDataSource.open();
-//                    photoDataSource.insertPhoto(model);
-//                    photoDataSource.close();
-//                } catch(SQLException e) {
-//                    Log.d("Vault", "Caught a SQLException", e);
-////                    Log.d("Vault", e.getMessage());
-//                }
-                Log.d("Vault", "Would have inserted photo in db: " + filename);
+                Log.d("Vault", "Launching task to save photo");
+                new SaveImageTask().execute(model);
             }
         }
     }
 
-    private void copyBitmapToFile(Bitmap bmp, File dest) {
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(dest);
-            bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
-        } catch(FileNotFoundException e) {
-            Log.w("Error copying bitmap to internal file", e);
-        } finally {
-            try {
-                if(fos != null) {
-                    fos.close();
-                }
-            } catch(IOException e) {
-                Log.w("Vault", "Error closing output stream", e);
+    private File createImageFile() throws IOException {
+        File storageDir = new File(getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Vault");
+
+        if(!storageDir.exists()) {
+            if(!storageDir.mkdirs()) {
+                Log.d("Vault", "Failed to create picture storage directory");
+                return null;
             }
         }
-    }
 
-    private File createIntImageFile() throws IOException {
-        String filename = "image";
-        if(rand == null) {
-            rand = new Random();
-        }
-        long id = rand.nextLong();
-        filename += id + ".png";
-        Log.d("Vault", "Creating image: " + filename);
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String filename = "image_" + timestamp + ".jpg";
+        File image = new File(storageDir.getPath() + File.separator + filename);
 
-        File image = new File(getApplicationContext().getFilesDir(), filename);
-
-//        photoPath = image.getAbsolutePath();
-        return image;
-    }
-
-    private File createExtImageFile() throws IOException {
-        String filename = "image";
-        if(rand == null) {
-            rand = new Random();
-        }
-        long id = rand.nextLong();
-        filename += id;
-        Log.d("Vault", "Creating image: " + filename);
-
-        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-
-        File image = File.createTempFile(filename, ".jpg", storageDir);
-
+        Log.d("Vault", "Creating image at " + image.getAbsolutePath());
         photoPath = image.getAbsolutePath();
+
         return image;
+    }
+
+    private class SaveImageTask extends AsyncTask<PhotoModel, Void, PhotoModel> {
+
+        protected PhotoModel doInBackground(PhotoModel... bmps) {
+            PhotoModel model = null;
+            if(bmps.length > 0) {
+                PhotoDataSource pds = new PhotoDataSource(getApplicationContext());
+                try {
+                    pds.open();
+                    model = pds.insertPhoto(bmps[0]);
+                    pds.close();
+                } catch(SQLException e) {
+                    Log.w("Vault", "Error inserting photo into db", e);
+                }
+            }
+
+            return model;
+        }
     }
 }
