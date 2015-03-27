@@ -16,15 +16,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String PHOTOS_DATA = "data";
 
     private static final String DATABASE_NAME = "vault.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 5;
     private SQLiteDatabase database;
 
     private static final String DROP_TABLE = "DROP TABLE IF EXISTS ";
     private static final String DATABASE_CREATE = "create table if not exists "
             + TABLE_PHOTOS + " ("
             + PHOTOS_ID + " integer primary key autoincrement, "
-            + PHOTOS_PATH + " text not null, "
-            + PHOTOS_DATA + " blob not null"
+            + PHOTOS_PATH + " text not null"
+//            + PHOTOS_DATA + " blob not null"
             + ");";
 
     public DatabaseHelper(Context c) {
@@ -39,7 +39,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.d("Vault", "Upgrading database, destroying data");
-        database.execSQL(DROP_TABLE + TABLE_PHOTOS);
+        db.execSQL(DROP_TABLE + TABLE_PHOTOS);
 
         onCreate(db);
     }

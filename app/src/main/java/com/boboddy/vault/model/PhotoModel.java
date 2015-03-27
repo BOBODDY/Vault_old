@@ -7,7 +7,7 @@ public class PhotoModel {
 
     private long _id;
     private String filepath;
-    private byte[] data;
+//    private byte[] data;
 
     public long get_id() {
         return _id;
@@ -25,12 +25,16 @@ public class PhotoModel {
         this.filepath = filepath;
     }
 
-    public byte[] getData() {
-        return data;
-    }
+//    public byte[] getData() {
+//        return data;
+//    }
+//
+//    public void setData(byte[] data) {
+//        this.data = data;
+//    }
 
-    public void setData(byte[] data) {
-        this.data = data;
+    public String toString() {
+        return filepath;
     }
 
 }

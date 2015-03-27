@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.boboddy.vault.db.DatabaseHelper;
 import com.boboddy.vault.model.PhotoModel;
@@ -20,8 +21,8 @@ public class PhotoDataSource {
 
     private String[] columns = {
             DatabaseHelper.PHOTOS_ID,
-            DatabaseHelper.PHOTOS_PATH,
-            DatabaseHelper.PHOTOS_DATA
+            DatabaseHelper.PHOTOS_PATH
+//            DatabaseHelper.PHOTOS_DATA
     };
 
     public PhotoDataSource(Context c) {
@@ -39,7 +40,7 @@ public class PhotoDataSource {
     public PhotoModel insertPhoto(PhotoModel photoModel) {
         ContentValues cv = new ContentValues();
         cv.put(DatabaseHelper.PHOTOS_PATH, photoModel.getFilepath());
-        cv.put(DatabaseHelper.PHOTOS_DATA, photoModel.getData());
+//        cv.put(DatabaseHelper.PHOTOS_DATA, photoModel.getData());
 
         long id = database.insert(DatabaseHelper.TABLE_PHOTOS, null, cv);
 
@@ -56,8 +57,12 @@ public class PhotoDataSource {
     public ArrayList<PhotoModel> getPhotoList() {
         ArrayList<PhotoModel> pictures = new ArrayList<PhotoModel>();
 
-        Cursor cursor = database.query(DatabaseHelper.TABLE_PHOTOS, columns,
-                null, null, null, null, null);
+//        Cursor cursor = database.query(DatabaseHelper.TABLE_PHOTOS, columns,
+//                null, null, null, null, null);
+        Cursor cursor = database.rawQuery("select * from " + dbHelper.TABLE_PHOTOS, null);
+
+        Log.d("Vault", "Cursor count: " + cursor.getCount());
+
         cursor.moveToFirst();
         while(!cursor.isAfterLast()) {
             PhotoModel photo = cursorToPhotoModel(cursor);
@@ -72,7 +77,7 @@ public class PhotoDataSource {
         PhotoModel photoModel = new PhotoModel();
         photoModel.set_id(cursor.getLong(0));
         photoModel.setFilepath(cursor.getString(1));
-        photoModel.setData(cursor.getBlob(2));
+//        photoModel.setData(cursor.getBlob(2));
         return photoModel;
     }
 

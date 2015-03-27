@@ -11,9 +11,14 @@ import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.boboddy.vault.db.PhotoDataSource;
 import com.boboddy.vault.R;
@@ -26,15 +31,17 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
 
 
 public class MainActivity extends ActionBarActivity {
 
-    private Random rand;
+    private PhotoDataSource photoDataSource;
 
-    ImageView image;
+//    ImageView image;
+    ListView listView;
 
     private String photoPath = "";
 
@@ -45,9 +52,40 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        image = (ImageView) findViewById(R.id.image);
+        listView = (ListView) findViewById(R.id.contentListView);
+
+//        image = (ImageView) findViewById(R.id.image);
+
+        if(photoDataSource == null) {
+            photoDataSource = new PhotoDataSource(this);
+        }
+
+        updateListview();
     }
 
+    public void updateListview() {
+        if(photoDataSource == null) {
+            photoDataSource = new PhotoDataSource(getApplicationContext());
+        }
+        ArrayList<PhotoModel> photos = null;
+        try {
+            photoDataSource.open();
+            photos = photoDataSource.getPhotoList();
+            photoDataSource.close();
+        } catch(SQLException e) {
+            Log.w("Vault", "error", e);
+        }
+
+        if(photos != null) {
+            ArrayAdapter<PhotoModel> adapter = new ArrayAdapter<PhotoModel>(getApplicationContext(),
+                    android.R.layout.simple_list_item_1, photos);
+
+            if (listView == null) {
+                listView = (ListView) findViewById(R.id.contentListView);
+            }
+            listView.setAdapter(adapter);
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -109,8 +147,8 @@ public class MainActivity extends ActionBarActivity {
             if(imageBitmap != null)
             {
                 //Scale the Bitmap so that it fits on canvas.
-                Bitmap scaled = imageBitmap.createScaledBitmap(imageBitmap, (imageBitmap.getWidth()/4), (imageBitmap.getHeight()/4),false);
-                image.setImageBitmap(scaled);
+//                Bitmap scaled = imageBitmap.createScaledBitmap(imageBitmap, (imageBitmap.getWidth()/4), (imageBitmap.getHeight()/4),false);
+//                image.setImageBitmap(scaled);
 
                 //Add the image to the database
                 int numBytes = imageBitmap.getByteCount();
@@ -118,7 +156,7 @@ public class MainActivity extends ActionBarActivity {
                 imageBitmap.copyPixelsToBuffer(buf);
 
                 PhotoModel model = new PhotoModel();
-                model.setData(buf.array());
+//                model.setData(buf.array());
                 model.setFilepath(filename);
 
                 Log.d("Vault", "Launching task to save photo");
@@ -149,20 +187,30 @@ public class MainActivity extends ActionBarActivity {
 
     private class SaveImageTask extends AsyncTask<PhotoModel, Void, PhotoModel> {
 
+        @Override
         protected PhotoModel doInBackground(PhotoModel... bmps) {
             PhotoModel model = null;
             if(bmps.length > 0) {
-                PhotoDataSource pds = new PhotoDataSource(getApplicationContext());
+                if(photoDataSource == null) {
+                    photoDataSource = new PhotoDataSource(getApplicationContext());
+                }
+
                 try {
-                    pds.open();
-                    model = pds.insertPhoto(bmps[0]);
-                    pds.close();
+                    photoDataSource.open();
+                    model = photoDataSource.insertPhoto(bmps[0]);
+                    photoDataSource.close();
                 } catch(SQLException e) {
                     Log.w("Vault", "Error inserting photo into db", e);
                 }
             }
 
             return model;
+        }
+
+        @Override
+        protected void onPostExecute(PhotoModel photoModel) {
+            super.onPostExecute(photoModel);
+            updateListview();
         }
     }
 }
