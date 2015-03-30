@@ -9,5 +9,10 @@
     <string name="unlock">Unlock</string>
     <string name="wrong_pin">Wrong PIN</string>
     <string name="title_activity_image">Image Viewer</string>
+    <string name="title_activity_new_pin">Create New PIN</string>
+    <string name="new_pin">New PIN</string>
+    <string name="reenter_pin">Reenter PIN</string>
+    <string name="done">Done</string>
+    <string name="prefs_name">VaultPrefs</string>
 
 </resources>

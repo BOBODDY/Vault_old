@@ -16,7 +16,7 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name=".PIN"
+            android:name=".ui.PIN"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,6 +31,14 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.boboddy.vault.ui.MainActivity" />
+        </activity>
+        <activity
+            android:name=".ui.NewPinActivity"
+            android:label="@string/title_activity_new_pin"
+            android:parentActivityName=".ui.PIN" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.PIN" />
         </activity>
     </application>
 

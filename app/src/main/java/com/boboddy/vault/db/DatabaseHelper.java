@@ -14,6 +14,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String PHOTOS_ID = "_id";
     public static final String PHOTOS_PATH = "path";
 
+//    public static final String TABLE_USERS = "users"; // This might be useful
+
     private static final String DATABASE_NAME = "vault.db";
     private static final int DATABASE_VERSION = 5;
     private SQLiteDatabase database;

@@ -1,4 +1,4 @@
-package com.boboddy.vault;
+package com.boboddy.vault.ui;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,13 +7,19 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.boboddy.vault.R;
 import com.boboddy.vault.ui.MainActivity;
+import com.boboddy.vault.ui.NewPinActivity;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 
 public class PIN extends ActionBarActivity {
@@ -21,12 +27,27 @@ public class PIN extends ActionBarActivity {
     TextView title;
     EditText pin;
 
+    final String PREFS_NAME = "VaultPreferences";
+
+    final static int CREATE_PIN = 123;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pin);
 		
-		// I should add a check to see if this is the first run and offer to set up a PIN
+		// check to see if this is the first run and offer to set up a PIN
+        SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+        if(prefs.getBoolean("first_run", true)) {
+            Log.d("Vault", "First run!");
+
+            Intent newPinActivity = new Intent(this, NewPinActivity.class);
+            startActivity(newPinActivity);
+
+            prefs.edit().putBoolean("first_run", false).apply();
+        }
+
+
         title = (TextView) findViewById(R.id.unlock_title);
         pin = (EditText) findViewById(R.id.pin_edittext);
         pin.setGravity(Gravity.CENTER);
@@ -43,11 +64,9 @@ public class PIN extends ActionBarActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                SharedPreferences prefs = getPreferences(MODE_PRIVATE);
-                String savedPin = prefs.getString("pin", "1234");
                 String enteredPin = s.toString();
 
-                if(enteredPin.equals(savedPin)) {
+                if(checkPin(enteredPin)) {
                     Intent i = new Intent(getApplicationContext(), MainActivity.class);
                     startActivity(i);
 
@@ -63,6 +82,35 @@ public class PIN extends ActionBarActivity {
         });
     }
 
+    private boolean checkPin(String pin) {
+        boolean res = true;
+
+        if(pin.length() == 4) {
+            SharedPreferences prefs = getSharedPreferences(PREFS_NAME, 0);
+
+            String storedHash = prefs.getString("user_pin", "");
+
+            if (storedHash.equals("")) {
+                res = false;
+            }
+            String inputHash = "";
+            try {
+                MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                digest.update(pin.getBytes());
+                inputHash = new String(digest.digest());
+            } catch (NoSuchAlgorithmException e) {
+                Log.e("Vault", "error hashing inputted pin", e);
+            }
+
+            if (storedHash.equals(inputHash)) {
+                res = true;
+            }
+        } else {
+            res = false;
+        }
+
+        return res;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
