@@ -22,8 +22,6 @@ public class ImageActivity extends ActionBarActivity {
         setContentView(R.layout.activity_image);
 
         mainImage = (ImageView) findViewById(R.id.mainImage);
-
-        filepath = getIntent().getExtras().getString("filepath");
     }
 
     @Override
