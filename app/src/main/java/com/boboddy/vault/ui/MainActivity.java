@@ -14,7 +14,9 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -44,6 +46,7 @@ public class MainActivity extends ActionBarActivity {
     ListView listView;
 
     private String photoPath = "";
+    private static ArrayList<PhotoModel> photos;
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
@@ -53,8 +56,27 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         listView = (ListView) findViewById(R.id.contentListView);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.d("Vault", "in onItemClick");
+                Log.d("Vault", "position: " + position);
+                Log.d("Vault", "id: " + id);
 
-//        image = (ImageView) findViewById(R.id.image);
+                if(photos == null) {
+                    updateListview();
+                }
+
+                PhotoModel photoModel = photos.get(position);
+
+                Log.d("Vault", "loading image: " + photoModel.getFilepath());
+
+                Intent viewImage = new Intent(getApplicationContext(), ImageActivity.class);
+                viewImage.putExtra("filepath", photoModel.getFilepath());
+
+                startActivity(viewImage);
+            }
+        });
 
         if(photoDataSource == null) {
             photoDataSource = new PhotoDataSource(this);
@@ -67,7 +89,7 @@ public class MainActivity extends ActionBarActivity {
         if(photoDataSource == null) {
             photoDataSource = new PhotoDataSource(getApplicationContext());
         }
-        ArrayList<PhotoModel> photos = null;
+//        ArrayList<PhotoModel> photos = null;
         try {
             photoDataSource.open();
             photos = photoDataSource.getPhotoList();

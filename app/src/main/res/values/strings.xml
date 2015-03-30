@@ -8,5 +8,6 @@
     <string name="title_activity_pin">Unlock</string>
     <string name="unlock">Unlock</string>
     <string name="wrong_pin">Wrong PIN</string>
+    <string name="title_activity_image">Image Viewer</string>
 
 </resources>
