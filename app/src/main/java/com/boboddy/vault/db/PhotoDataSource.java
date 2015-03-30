@@ -22,7 +22,6 @@ public class PhotoDataSource {
     private String[] columns = {
             DatabaseHelper.PHOTOS_ID,
             DatabaseHelper.PHOTOS_PATH
-//            DatabaseHelper.PHOTOS_DATA
     };
 
     public PhotoDataSource(Context c) {
@@ -40,7 +39,6 @@ public class PhotoDataSource {
     public PhotoModel insertPhoto(PhotoModel photoModel) {
         ContentValues cv = new ContentValues();
         cv.put(DatabaseHelper.PHOTOS_PATH, photoModel.getFilepath());
-//        cv.put(DatabaseHelper.PHOTOS_DATA, photoModel.getData());
 
         long id = database.insert(DatabaseHelper.TABLE_PHOTOS, null, cv);
 
@@ -77,7 +75,6 @@ public class PhotoDataSource {
         PhotoModel photoModel = new PhotoModel();
         photoModel.set_id(cursor.getLong(0));
         photoModel.setFilepath(cursor.getString(1));
-//        photoModel.setData(cursor.getBlob(2));
         return photoModel;
     }
 

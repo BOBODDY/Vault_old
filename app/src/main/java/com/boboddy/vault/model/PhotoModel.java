@@ -25,14 +25,6 @@ public class PhotoModel {
         this.filepath = filepath;
     }
 
-//    public byte[] getData() {
-//        return data;
-//    }
-//
-//    public void setData(byte[] data) {
-//        this.data = data;
-//    }
-
     public String toString() {
         return filepath;
     }

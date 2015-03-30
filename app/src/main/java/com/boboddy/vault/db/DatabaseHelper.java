@@ -13,7 +13,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_PHOTOS = "photos";
     public static final String PHOTOS_ID = "_id";
     public static final String PHOTOS_PATH = "path";
-    public static final String PHOTOS_DATA = "data";
 
     private static final String DATABASE_NAME = "vault.db";
     private static final int DATABASE_VERSION = 5;
@@ -24,7 +23,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + TABLE_PHOTOS + " ("
             + PHOTOS_ID + " integer primary key autoincrement, "
             + PHOTOS_PATH + " text not null"
-//            + PHOTOS_DATA + " blob not null"
             + ");";
 
     public DatabaseHelper(Context c) {
