@@ -156,7 +156,6 @@ public class MainActivity extends ActionBarActivity {
                 imageBitmap.copyPixelsToBuffer(buf);
 
                 PhotoModel model = new PhotoModel();
-//                model.setData(buf.array());
                 model.setFilepath(filename);
 
                 Log.d("Vault", "Launching task to save photo");
