@@ -1,5 +1,6 @@
 package com.boboddy.vault.ui;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -21,7 +22,7 @@ import com.boboddy.vault.R;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class NewPinActivity extends ActionBarActivity {
+public class NewPinActivity extends Activity {
 
     Button doneButton;
     EditText pin1;

@@ -1,5 +1,6 @@
 package com.boboddy.vault.ui;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.ActionBarActivity;
@@ -10,7 +11,7 @@ import android.widget.ImageView;
 
 import com.boboddy.vault.R;
 
-public class ImageActivity extends ActionBarActivity {
+public class ImageActivity extends Activity {
 
     ImageView mainImage;
 

@@ -1,5 +1,6 @@
 package com.boboddy.vault.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -38,11 +39,10 @@ import java.util.Date;
 import java.util.Random;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
 
     private PhotoDataSource photoDataSource;
 
-//    ImageView image;
     ListView listView;
 
     private String photoPath = "";
